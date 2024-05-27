@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import './cv.css'
 
 export default function CvApp(){
-    const [showForm, setshowForm] = useState(true)
+    const [showForm, setshowForm] = useState(false)
     const [formDetails, setformDetails] = useState({name:'',email:'',phone:'',address:''});
     const [isformLoaded, setisFormLoaded] = useState(false)
     const [editingText, setEditingText] = useState({companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'', description:''})
     const [editingId, setEditingId] = useState(null)
-    const [eduDetails, setEduDetails] = useState({schoolName:'',studyTitle:'',studyLocation:'',startDate:'',endDate:''});
+    const [eduDetails, setEduDetails] = useState({schoolName:'',studyTitle:'',studyLocation:'',startDate:'',endDate:'',description:''});
     const [profExpList, setProfExpList] = useState([]);
     const [profDetails, setProfDetails] = useState({id:'', companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'', description:''});
     const [iseditingOpened, setIsEditingOpened] = useState({personalInfoEdit:false,eduEdit:false,profEdit:true})
@@ -47,25 +47,22 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
     const handleProfSubmit = (e)=>{
         e.preventDefault();
         setEditingId(null)
-        setProfDetails({...profDetails,id:Date.now()})
+        // setProfDetails({...profDetails,id:Date.now()})
         setProfExpList([...profExpList,profDetails])
         setProfDetails({...profDetails,id:Date.now(),companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'',})
         setshowForm(false)
     }
 
-    const handleAddExp = ()=>{
-        setIsEditingOpened({...iseditingOpened,profEdit:false})
-
-    }
     const handleProfEdit = (id)=>{
         // e.preventDefault();
        profExpList.map(item=>{
         if(item.id === id){
-            item.companyName = editingText.companyName;
-            item.posTitle = editingText.posTitle;
-            item.companyLocation = editingText.companyLocation;
-            item.startDate = editingText.startDate;
-            item.endDate = editingText.endDate;
+           item.companyName =  editingText.companyName === '' ? item.companyName : editingText.companyName
+           item.posTitle =  editingText.posTitle === '' ? item.posTitle : editingText.posTitle
+           item.companyLocation =  editingText.companyLocation === '' ? item.companyLocation : editingText.companyLocation
+           item.startDate =  editingText.startDate === '' ? item.startDate : editingText.startDate
+           item.endDate =  editingText.endDate === '' ? item.endDate : editingText.endDate
+           item.description =  editingText.description === '' ? item.description : editingText.description
         }
        })
        setProfExpList([...profExpList])
@@ -115,16 +112,16 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
                 {iseditingOpened.personalInfoEdit ? 
                 <div className="updatedInfo">
                     <div className="experiences">
-                    <div className="my-details">
-                        <h3>{formDetails.name}</h3>
-                        <p>{formDetails.email}</p>
-                        <p>{formDetails.phone}</p>
-                        <p>{formDetails.address}</p>
-                    </div>
-                    <div className="editBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
-                        <p onClick={()=>setIsEditingOpened({...iseditingOpened,personalInfoEdit:false})}>Edit</p>
-                    </div>
+                        <div className="my-details">
+                            <h3>{formDetails.name}</h3>
+                            <p>{formDetails.email}</p>
+                            <p>{formDetails.phone}</p>
+                            <p>{formDetails.address}</p>
+                        </div>
+                        <div className="editBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+                            <p onClick={()=>setIsEditingOpened({...iseditingOpened,personalInfoEdit:false})}>Edit</p>
+                        </div>
                     </div>
                  </div>
                 : 
@@ -219,9 +216,6 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" /></svg>
                 </div>
                 
-
-                
-
                 
                 <div className="updatedInfo">
                     {profExpList.map(item=>{
@@ -254,15 +248,19 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
                                 </div>
                                 <div className="formField">
                                     <label htmlFor="companyLoc">Company's Location</label>
-                                    <input type="text" name="" id="companyLoc" placeholder={item.companyLocation} onChange={(e)=>setEditingText({...editingText,companyLocation:e.target.value})}/>
+                                    <input type="text" name="" id="companyLoc" placeholder={item.companyLocation} onChange={(e)=>setEditingText({...editingText,companyLocation:e.target.value})} required/>
                                 </div>
                                 <div className="formField">
                                     <label htmlFor="startDate">Start Date</label>
-                                    <input type="month" name="" id="startDate" placeholder={item.startDate} onChange={(e)=>setEditingText({...editingText,startDate:e.target.value})}/>
+                                    <input type="month" name="" id="startDate" placeholder={item.startDate} onChange={(e)=>setEditingText({...editingText,startDate:e.target.value})} required/>
                                 </div>
                                 <div className="formField">
                                     <label htmlFor="endDate">End Date</label>
-                                    <input type="month" name="" id="endDate" placeholder={item.endDate} onChange={(e)=>setEditingText({...editingText,endDate:e.target.value})}/>
+                                    <input type="month" name="" id="endDate" placeholder={item.endDate} onChange={(e)=>{e.target.value === '' ? setEditingText({...editingText,endDate:item.endDate}):setEditingText({...editingText,endDate:e.target.value})}} required/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="description">Description</label>
+                                    <input type="text" name="" id="description" placeholder={item.description} onChange={(e)=>{e.target.value === '' ? setEditingText({...editingText,description:item.description}):setEditingText({...editingText,description:e.target.value})}} required/>
                                 </div>
                                 <button type="button" onClick={()=>handleProfEdit(item.id)}>Add Edit</button>
                             </form>
@@ -273,7 +271,7 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
                         )
                     })}
 
-{showForm && <form onSubmit={handleProfSubmit}>
+                    {showForm && <form onSubmit={handleProfSubmit}>
                                 <h3>Professional Experience</h3>
                                 <div className="formField">
                                     <label htmlFor="name">Company's Name</label>
@@ -295,11 +293,15 @@ function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editin
                                     <label htmlFor="endDate">End Date</label>
                                     <input type="month" name="" id="endDate" value={profDetails.endDate} placeholder="London, Uk" onChange={(e)=>setProfDetails({...profDetails,endDate:e.target.value})}/>
                                 </div>
+                                <div className="formField">
+                                    <label htmlFor="description">Description</label>
+                                    <input type="text" name="" id="description" value={profDetails.description} placeholder="" onChange={(e)=>setProfDetails({...profDetails,description:e.target.value})}/>
+                                </div>
                                 <button type="submit">Submit</button>
                             </form>}
 
 
-                    <button className="newExp" onClick={()=>setshowForm(true)}>Add new Experience</button>
+                    <button className="newExp" onClick={()=>{setshowForm(true);}}>Add new Experience</button>
                     
                 </div>
             
