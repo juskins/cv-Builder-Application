@@ -264,6 +264,12 @@ form button{
     text-align: center;
     display: flex;
     flex-direction: column;
+    margin: 20px 0;
+    padding: 15px;
+}
+.sidebar-details .education-item.pro{
+    background-color: rgb(234, 233, 233);
+
 }
 .education-item .details{
     display: flex;
@@ -278,10 +284,24 @@ form button{
 
 main .updatedInfo{
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     padding: 0px;
     height: 0;
+    gap: 0px;
     overflow: hidden;
+}
+main .updatedInfo .experiences{
+    display: flex;
+    justify-content: space-between;
+    padding: 10px 20px;
+    width: 100%;
+}
+main .updatedInfo .experience{
+    display: flex;
+    flex-direction: column;
+    justify-content:center;
+    border-top: 1px solid;
+    width: 100%;
 }
 main .updatedInfo .editBtn{
     display: flex;
@@ -294,9 +314,24 @@ main .updatedInfo .editBtn p{
     font-size: 1.2rem;
     font-weight: bold;
 }
+main .newExp{
+    display: none;
+}
+.open .newExp{
+    display: inline-block;
+    max-width: 500px;
+    text-align: center;
+    margin: 20px auto;
+}
 .open .updatedInfo{
     height: auto;
     padding: 10px;
+
+    /* background-color: red; */
+}
+
+button:disabled{
+    cursor: not-allowed;
 }
 
 

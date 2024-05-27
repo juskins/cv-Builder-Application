@@ -2,16 +2,21 @@ import React, { useState } from "react";
 import './cv.css'
 
 export default function CvApp(){
+    const [showForm, setshowForm] = useState(true)
     const [formDetails, setformDetails] = useState({name:'',email:'',phone:'',address:''});
+    const [isformLoaded, setisFormLoaded] = useState(false)
+    const [editingText, setEditingText] = useState({companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'', description:''})
+    const [editingId, setEditingId] = useState(null)
     const [eduDetails, setEduDetails] = useState({schoolName:'',studyTitle:'',studyLocation:'',startDate:'',endDate:''});
-    const [profDetails, setProfDetails] = useState({companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'', description:''});
-    const [iseditingOpened, setIsEditingOpened] = useState({personalInfoEdit:false,eduEdit:false,profEdit:false})
+    const [profExpList, setProfExpList] = useState([]);
+    const [profDetails, setProfDetails] = useState({id:'', companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'', description:''});
+    const [iseditingOpened, setIsEditingOpened] = useState({personalInfoEdit:false,eduEdit:false,profEdit:true})
 
     return(
         <div className="cvContainer">
             <div className="flexContainer">
-                <Main formDetails={formDetails} setformDetails={setformDetails} iseditingOpened={iseditingOpened} setIsEditingOpened={setIsEditingOpened} eduDetails={eduDetails} setEduDetails={setEduDetails} profDetails={profDetails} setProfDetails={setProfDetails}/>
-                <SideBar formDetails={formDetails} setformDetails={setformDetails} eduDetails={eduDetails} setEduDetails={setEduDetails} profDetails={profDetails} setProfDetails={setProfDetails}/>
+                <Main isformLoaded={isformLoaded} setisFormLoaded={setisFormLoaded} editingText={editingText} setEditingText={setEditingText} editingId={editingId} setEditingId={setEditingId} showForm={showForm} setshowForm={setshowForm} formDetails={formDetails} setformDetails={setformDetails} iseditingOpened={iseditingOpened} setIsEditingOpened={setIsEditingOpened} eduDetails={eduDetails} setEduDetails={setEduDetails} profDetails={profDetails} setProfDetails={setProfDetails} profExpList={profExpList} setProfExpList={setProfExpList}/>
+                <SideBar formDetails={formDetails} setformDetails={setformDetails} eduDetails={eduDetails} setEduDetails={setEduDetails} profDetails={profDetails} setProfDetails={setProfDetails} profExpList={profExpList} setProfExpList={setProfExpList}/>
             </div>
             <Footer/>
 
@@ -19,7 +24,7 @@ export default function CvApp(){
     )
 }
 
-function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,eduDetails,setEduDetails,profDetails,setProfDetails}){
+function Main({isformLoaded, setisFormLoaded, editingText, setEditingText,editingId,setEditingId,showForm,setshowForm, formDetails,setformDetails,iseditingOpened,setIsEditingOpened,eduDetails,setEduDetails,profDetails,setProfDetails,profExpList,setProfExpList}){
     const [openAccordion, setOpenAccordion] = useState(null);
 
     const handleSectionClick = (id)=>{
@@ -41,29 +46,60 @@ function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,edu
     }
     const handleProfSubmit = (e)=>{
         e.preventDefault();
-        setProfDetails({...profDetails})
-        setIsEditingOpened({...iseditingOpened,profEdit:true})
+        setEditingId(null)
+        setProfDetails({...profDetails,id:Date.now()})
+        setProfExpList([...profExpList,profDetails])
+        setProfDetails({...profDetails,id:Date.now(),companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'',})
+        setshowForm(false)
     }
+
+    const handleAddExp = ()=>{
+        setIsEditingOpened({...iseditingOpened,profEdit:false})
+
+    }
+    const handleProfEdit = (id)=>{
+        // e.preventDefault();
+       profExpList.map(item=>{
+        if(item.id === id){
+            item.companyName = editingText.companyName;
+            item.posTitle = editingText.posTitle;
+            item.companyLocation = editingText.companyLocation;
+            item.startDate = editingText.startDate;
+            item.endDate = editingText.endDate;
+        }
+       })
+       setProfExpList([...profExpList])
+       setEditingId(null)
+       setshowForm(false)
+    }
+
     const clearResume = ()=>{
         setformDetails({...formDetails,name:'',email:'',phone:'',address:''});
         setEduDetails({...eduDetails,schoolName:'',studyTitle:'',studyLocation:'',startDate:'',endDate:''});
         setProfDetails({...profDetails,companyName:'',posTitle:'',companyLocation:'',startDate:'',endDate:'',description:''});
         setIsEditingOpened({...iseditingOpened,personalInfoEdit:false,eduEdit:false,profEdit:false});
+        setProfExpList([])
         setOpenAccordion(null)
+        setisFormLoaded(false)
+
     } 
     const loadExample = ()=>{
         setformDetails({...formDetails,name:'Omojuwa Babatunde Kolawole',email:'omojuwababatunde1@gmail.com',phone:'+234 70810510',address:'Lagos,Nigeria'});
         setEduDetails({...eduDetails,schoolName:'Federal University of Technology Akure',studyTitle:'Computer Engineering',studyLocation:'Akure',startDate:'2018-01',endDate:'2023-12'});
-        setProfDetails({...profDetails,companyName:'Google Inc',posTitle:'Web Developer',companyLocation:'Silicon Valley, USA',startDate:'2025-01',endDate:'2024-01',description:'I love programming'});
-        setIsEditingOpened({...iseditingOpened,personalInfoEdit:false,eduEdit:false,profEdit:false});
+        setProfDetails({...profDetails,id:Date.now(), companyName:'Google Inc',posTitle:'Web Developer',companyLocation:'Silicon Valley, USA',startDate:'2025-01',endDate:'2024-01',description:'I love programming'});
+        setIsEditingOpened({...iseditingOpened,personalInfoEdit:false,eduEdit:false,});
+        setEditingId(false)
         setOpenAccordion(null)
+        setisFormLoaded(true)
+        // setProfExpList([])
+        setProfExpList([...profExpList,{...profDetails,companyName:'Google Inc',posTitle:'Web Developer',companyLocation:'Silicon Valley, USA',startDate:'2025-01',endDate:'2024-01',description:'I love programming'}])
     }  
     
     return(
         <main>
             <div className="downloadResume">
                 <button onClick={clearResume}>Clear Resume</button>
-                <button onClick={loadExample} className="loadExample">Load Example</button>
+                <button onClick={loadExample} className="loadExample" disabled={isformLoaded}>Load Example</button>
                 <button className="resumedownloadBtn">Download</button>
             </div>
 
@@ -78,6 +114,7 @@ function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,edu
 
                 {iseditingOpened.personalInfoEdit ? 
                 <div className="updatedInfo">
+                    <div className="experiences">
                     <div className="my-details">
                         <h3>{formDetails.name}</h3>
                         <p>{formDetails.email}</p>
@@ -87,6 +124,7 @@ function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,edu
                     <div className="editBtn">
                         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
                         <p onClick={()=>setIsEditingOpened({...iseditingOpened,personalInfoEdit:false})}>Edit</p>
+                    </div>
                     </div>
                  </div>
                 : 
@@ -127,16 +165,18 @@ function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,edu
 
                 {iseditingOpened.eduEdit ? 
                 <div className="updatedInfo">
-                    <div className="my-details">
-                        <h3>{eduDetails.schoolName}</h3>
-                        <p>{eduDetails.studyTitle}</p>
-                        <p>{eduDetails.studyLocation}</p>
-                        <p>{eduDetails.startDate}</p>
-                        <p>{eduDetails.endDate}</p>
-                    </div>
-                    <div className="editBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
-                        <p onClick={()=>setIsEditingOpened({...iseditingOpened,eduEdit:false})}>Edit</p>
+                    <div className="experiences">
+                        <div className="my-details">
+                            <h3>{eduDetails.schoolName}</h3>
+                            <p>{eduDetails.studyTitle}</p>
+                            <p>{eduDetails.studyLocation}</p>
+                            <p>{eduDetails.startDate}</p>
+                            <p>{eduDetails.endDate}</p>
+                        </div>
+                        <div className="editBtn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+                            <p onClick={()=>setIsEditingOpened({...iseditingOpened,eduEdit:false})}>Edit</p>
+                        </div>
                     </div>
                 </div>
             : 
@@ -178,59 +218,106 @@ function Main({formDetails,setformDetails,iseditingOpened,setIsEditingOpened,edu
                     </div>
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M7.41,8.58L12,13.17L16.59,8.58L18,10L12,16L6,10L7.41,8.58Z" /></svg>
                 </div>
+                
 
-                {iseditingOpened.profEdit ? 
+                
+
+                
                 <div className="updatedInfo">
-                    <div className="my-details">
-                        <h3>{profDetails.companyName}</h3>
-                        <p>{profDetails.posTitle}</p>
-                        <p>{profDetails.companyLocation}</p>
-                        <p>{profDetails.startDate}</p>
-                        <p>{profDetails.endDate}</p>
-                    </div>
-                    <div className="editBtn">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
-                        <p onClick={()=>setIsEditingOpened({...iseditingOpened,eduEdit:false})}>Edit</p>
-                    </div>
-                </div>
-            : 
-                <form onSubmit={handleProfSubmit}>
-                    <h3>Academic Experience</h3>
-                    <div className="formField">
-                        <label htmlFor="name">Company's Name</label>
-                        <input type="text" name="" id="name" placeholder={'Enter name of the company'} value={profDetails.companyName} onChange={(e)=>setProfDetails({...profDetails,companyName:e.target.value})} required/>
-                    </div>
-                    <div className="formField">
-                        <label htmlFor="posTitle">Title of Postion</label>
-                        <input type="text" name="" id="posTitle" placeholder={'Enter position title'} value={profDetails.posTitle} onChange={(e)=>setProfDetails({...profDetails,posTitle:e.target.value})} required/>
-                    </div>
-                    <div className="formField">
-                        <label htmlFor="companyLoc">Company's Location</label>
-                        <input type="text" name="" id="companyLoc" placeholder={'Enter company\'s Location'} value={profDetails.companyLocation} onChange={(e)=>setProfDetails({...profDetails,companyLocation:e.target.value})}/>
-                    </div>
-                    <div className="formField">
-                        <label htmlFor="startDate">Start Date</label>
-                        <input type="month" name="" id="startDate" value={profDetails.startDate} onChange={(e)=>setProfDetails({...profDetails,startDate:e.target.value})} required/>
-                    </div>
-                    <div className="formField">
-                        <label htmlFor="endDate">End Date</label>
-                        <input type="month" name="" id="endDate" value={profDetails.endDate} onChange={(e)=>setProfDetails({...profDetails,endDate:e.target.value})} required/>
-                    </div>
-                    <div className="formField">
-                        <label htmlFor="description">Description</label>
-                        <textarea value={profDetails.description} onChange={(e)=>setProfDetails({...profDetails,description:e.target.value})}/>
-                    </div>
-                    <button type="submit">Submit</button>
-                </form>}  
-            </div>
+                    {profExpList.map(item=>{
+                        return (
+                            <div key={item.id} className="experience">
+                                {editingId !== item.id 
+                                ?  <div className="experiences proItem">
+                                        <div className="my-details">
+                                            <h3>{item.companyName}</h3>
+                                            <p>{item.posTitle}</p>
+                                            <p>{item.companyLocation}</p>
+                                            <p>{item.startDate}</p>
+                                            <p>{item.endDate}</p>
+                                        </div>
+                                        <div className="editBtn" onClick={()=>{setEditingId(item.id); setshowForm(false)}}>
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" /></svg>
+                                            <p>Edit</p>
+                                        </div>
+                                    </div>
+                             : 
+                             <form>
+                                <h3>Professional Experience</h3>
+                                <div className="formField">
+                                    <label htmlFor="name">Company's Name</label>
+                                    <input type="text" name="" id="name" placeholder={item.companyName} onChange={(e)=>setEditingText({...editingText,companyName:e.target.value})} required/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="posTitle">Title of Position</label>
+                                    <input type="text" name="" id="posTitle" placeholder={item.posTitle} onChange={(e)=>setEditingText({...editingText,posTitle:e.target.value})} required/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="companyLoc">Company's Location</label>
+                                    <input type="text" name="" id="companyLoc" placeholder={item.companyLocation} onChange={(e)=>setEditingText({...editingText,companyLocation:e.target.value})}/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="startDate">Start Date</label>
+                                    <input type="month" name="" id="startDate" placeholder={item.startDate} onChange={(e)=>setEditingText({...editingText,startDate:e.target.value})}/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="endDate">End Date</label>
+                                    <input type="month" name="" id="endDate" placeholder={item.endDate} onChange={(e)=>setEditingText({...editingText,endDate:e.target.value})}/>
+                                </div>
+                                <button type="button" onClick={()=>handleProfEdit(item.id)}>Add Edit</button>
+                            </form>
 
+                             }
+                               
+                            </div>
+                        )
+                    })}
+
+{showForm && <form onSubmit={handleProfSubmit}>
+                                <h3>Professional Experience</h3>
+                                <div className="formField">
+                                    <label htmlFor="name">Company's Name</label>
+                                    <input type="text" name="" id="name" placeholder={'Enter company\'s Name'} value={profDetails.companyName} onChange={(e)=>setProfDetails({...profDetails,companyName:e.target.value})} required/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="posTitle">Title of Position</label>
+                                    <input type="text" name="" id="posTitle" placeholder={'Enter your position in the company'} value={profDetails.posTitle} onChange={(e)=>setProfDetails({...profDetails,posTitle:e.target.value})} required/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="companyLoc">Company's Location</label>
+                                    <input type="text" name="" id="companyLoc" placeholder={'Enter company Location'} value={profDetails.companyLocation} onChange={(e)=>setProfDetails({...profDetails,companyLocation:e.target.value})}/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="startDate">Start Date</label>
+                                    <input type="month" name="" id="startDate" value={profDetails.startDate} onChange={(e)=>setProfDetails({...profDetails,startDate:e.target.value})}/>
+                                </div>
+                                <div className="formField">
+                                    <label htmlFor="endDate">End Date</label>
+                                    <input type="month" name="" id="endDate" value={profDetails.endDate} placeholder="London, Uk" onChange={(e)=>setProfDetails({...profDetails,endDate:e.target.value})}/>
+                                </div>
+                                <button type="submit">Submit</button>
+                            </form>}
+
+
+                    <button className="newExp" onClick={()=>setshowForm(true)}>Add new Experience</button>
+                    
+                </div>
+            
+                
+            
+
+
+                 
+
+            </div>
+            
             
         </main>
     )
 }
 
 
-function SideBar({formDetails,eduDetails,profDetails,setProfDetails}){
+function SideBar({formDetails,eduDetails,profExpList,setProfExpList}){
     return(
         <div className="side-bar">
             <div className="sidebar-header">
@@ -268,17 +355,21 @@ function SideBar({formDetails,eduDetails,profDetails,setProfDetails}){
 
                 <div className="education-details">
                     <h3>Professional Experience</h3>
-                    <div className="education-item">
-                        <div className="details">
-                            <div>{profDetails.startDate} {profDetails.startDate !== '' && profDetails.endDate !== '' && <span>-</span>} {profDetails.endDate}</div>
-                            <h4>{profDetails.companyName}</h4>
-                            <h4>{profDetails.posTitle}</h4>
-                        </div>
-                        <div className="details">
-                            <div>{profDetails.companyLocation}</div>
-                            <p>{profDetails.description}</p>
+                    {profExpList.map(experience=>{
+                        return (
+                        <div className="education-item pro" key={experience.id}>
+                            <div className="details">
+                                <div>{experience.startDate} {experience.startDate !== '' && experience.endDate !== '' && <span>-</span>} {experience.endDate}</div>
+                                <h4>{experience.companyName}</h4>
+                                <h4>{experience.posTitle}</h4>
+                            </div>
+                            <div className="details">
+                                <div>{experience.companyLocation}</div>
+                                <p>{experience.description}</p>
+                            </div> 
                         </div> 
-                    </div> 
+                        )
+                    })}
                 </div>
             </section>
         </div>
